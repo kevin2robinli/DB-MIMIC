@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,10 +135,14 @@ public class ImporterServiceImpl implements ImporterService{
 	public void dbStorageFileCreation(String inputDataFileName, String[] columns) {
 		
 		for(String column: columns) {
-	    boolean directoryCreationStatus;		
+	    boolean directoryCreationStatus;
 
 		File dbStoragefile = new File("resource/db/" + inputDataFileName + "/" + column + ".txt");
+		if ( dbStoragefile.exists()) {
+			System.out.println("File " + column + ".txt already exsits.");
+		}
 		
+		else {
 		try {
 			directoryCreationStatus = dbStoragefile.createNewFile();
 			if(directoryCreationStatus){
@@ -152,9 +155,14 @@ public class ImporterServiceImpl implements ImporterService{
 			e.printStackTrace();
 		}
 	}
+	}
 		
 	//create data storage hash file.	
       File recordHash = new File("resource/db/" + inputDataFileName + "/" + "RecordHash" + ".txt");			
+      if ( recordHash.exists()) {
+			System.out.println("File RecordHash.txt already exsits.");
+		}
+      else {
       try {
     	  boolean recordHashStatus;
 		recordHashStatus = recordHash.createNewFile();
@@ -167,6 +175,7 @@ public class ImporterServiceImpl implements ImporterService{
 	} catch (IOException e) {
 		e.printStackTrace();
 	}
+      }
   }
 
 	

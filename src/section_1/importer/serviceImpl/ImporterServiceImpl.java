@@ -1,4 +1,4 @@
-package serviceImpl;
+package section_1.importer.serviceImpl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,10 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exception.DataOverMaxLengthException;
-import service.ImporterService;
 import util.ImporterPropertyLoader;
 
-public class ImporterServiceImpl implements ImporterService{
+public class ImporterServiceImpl implements section_1.importer.service.ImporterService{
 	
 	//For demo purpose, hard code the input file name. 
 	static final String IMPORTFILETYPE = "inputFileSampleOriginal";

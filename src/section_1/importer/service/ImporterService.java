@@ -27,5 +27,8 @@ public interface ImporterService {
     
     //overwrite old record(if already exists)
     public void overwrite(String filename,int lineNumber, String newData);
+    
+    //check one line of input data is valid or not
+    public boolean isThisLineDataValid(String[] columns);
  
 }

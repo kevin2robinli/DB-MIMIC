@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import exception.DataOverMaxLengthException;
 import service.ImporterService;
 import util.ImporterPropertyLoader;
 
@@ -24,7 +25,7 @@ public class ImporterServiceImpl implements ImporterService{
 	
 	
     //Read data input file 
-	public void readAndHandleFileSample() {
+	public void readAndHandleFileSample(){
 		try {
 		
 		//Load input file location. The location is stored in property file		
@@ -64,8 +65,17 @@ public class ImporterServiceImpl implements ImporterService{
 		  
 	    int nameIndex = 0;
 	    BufferedWriter dataStorageBufferWriter = null;
-    
+	    
+	    //
+	    boolean isThisLineValid = isThisLineDataValid(columns);
+	    
+    	if(!isThisLineValid) {
+    		throw new DataOverMaxLengthException("data [" + line + "] is over 64 chars. Invalid input.");
+    	}
+    	
+    	else {  
         for(String column : columns) {
+        	
         	//write data into DB storage files
     	    String dbStorageFile = "resource/db/" + IMPORTFILETYPE + "/" + columnNames[nameIndex++] + ".txt";	
     	    dataStorageBufferWriter = new BufferedWriter(new FileWriter(dbStorageFile,true));
@@ -74,11 +84,12 @@ public class ImporterServiceImpl implements ImporterService{
 		
 		dataStorageBufferWriter.flush();
 		dataStorageBufferWriter.close();
-		
-        }
+       }
         //insert Hashcode
         insertHash(hashFileLocation, newRecordHash);
-	  }
+      }
+       
+   }
 	    //if this line STB+TITLE+DATE is not unique, overwrite data in all files
 		else {
 		 int nameIndex = 0;
@@ -262,6 +273,19 @@ public class ImporterServiceImpl implements ImporterService{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}    
+	  }
+
+    //check one line of input data is valid or not
+	public boolean isThisLineDataValid(String[] columns) {
+		boolean isValid = true;
+		for(String column : columns) {
+			if(column.length() > 64){
+				isValid = false;
+				System.out.println("data: " + column + "is over the max length of 64 char");
+				return isValid;
+			}
+		}
+	return isValid;		
 	  }
 	}
 	

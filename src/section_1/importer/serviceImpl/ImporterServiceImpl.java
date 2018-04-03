@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exception.DataOverMaxLengthException;
-import util.ImporterPropertyLoader;
+import section_1.util.ImporterPropertyLoader;
 
 public class ImporterServiceImpl implements section_1.importer.service.ImporterService{
 	

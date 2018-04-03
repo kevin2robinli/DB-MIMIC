@@ -1,4 +1,4 @@
-package util;
+package section_1.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;

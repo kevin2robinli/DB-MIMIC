@@ -6,11 +6,16 @@ public interface OrderService {
 	
 	/*Order the selected result by date. Algorithm as below steps: 
 	 * 1. Fine the earliest date, get the index(line#) in SELECT result, then use the index to find all other columns in
-	 * other SELECT results. 
+	 * other SELECT results. Store the found record. 
 	 * 2. remove all found results from the SELECTED lists. now the new Lists are without the earliest record.
 	 * 3. recursively do step1, until all records are removed. 
+	 * 4. Output
 	 */
-	public List<List<String>> orderByDate(List<List<String>> selectedResult);
+	public List<List<String>> orderByDate(List<List<String>> selectedResult, int columnDATE_Index);
+	
+	//Assist method "orderByDate" to order records by Date. It is recursively invoked by method "orderByDate"
+	public List<List<String>> orderByDateAssister(List<List<String>> finalSelectResult, List<List<String>> selectedResult, int columnDATE_Index);
+
 	
 	//Order the selected result by letter
 	public List<List<String>> orderByLetter(List<List<String>> selectedResult);

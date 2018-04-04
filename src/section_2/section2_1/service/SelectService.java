@@ -9,5 +9,11 @@ public interface SelectService {
 	
 	//read data from dbStore file
 	public List<String> readDataFromDBStoreFile(String dbStoreFileName);
+	
+	//handle selected data
+	public List<List<String>> handleSelectedData(List<List<String>> selectedData);
+	
+	//get select data from date store file
+	public List<List<String>> selectFromDateStore(String columns[]);
 
 }

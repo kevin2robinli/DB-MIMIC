@@ -12,26 +12,26 @@ import section_2.section2_1.service.SelectService;
 
 public class SelectServiceImpl implements SelectService{
 	
-	//For demo purpose, hard code the data store folder name (This is created by section 1 when generate db store file) 
 	static final String IMPORTFILETYPE = "inputFileSampleOriginal";
 
-	//execute select query
+	/* Execute select query
+	 * 
+	 * 1. Read from queried-column data store files. For each column, data is stored in List<Stirng>.
+	 * 2. Handle data from step1. Generate select result. 
+	 *    The result contains multiple rows. Each row is a combination of all queried columns.
+	 */
 	public List<List<String>> select(String[] columns) {
 	
-		List<List<String>> selectResult = new ArrayList<List<String>>();
-		
-		for(String column : columns) {
-			String dbStoreFileLocation =  "resource/db/" + IMPORTFILETYPE + "/" + column + ".txt";
-			List<String> columnResult = new ArrayList<String>();
-			columnResult = readDataFromDBStoreFile(dbStoreFileLocation);
-			selectResult.add(columnResult);
-		}
-		
-		return selectResult;
-		
+		List<List<String>> selectFromDataStoreResult = selectFromDateStore(columns);
+		List<List<String>> rawOutputResult = new ArrayList<List<String>>();
+
+		rawOutputResult = handleSelectedData(selectFromDataStoreResult);
+		return rawOutputResult;		
 	}
 
-	//read data from a dbStore file
+	/*Read data from data store file
+	 * 
+	 */
 	public List<String> readDataFromDBStoreFile(String dbStoreFileLocation) {
 		
 		File file = new File(dbStoreFileLocation);
@@ -57,6 +57,45 @@ public class SelectServiceImpl implements SelectService{
 			io_e.printStackTrace();
 		}
 		return resultList;	
+	}
+
+	/* Handle selected data
+	 * 
+	 * Handle selected date, generate output result. 
+	 * The result contains multiple rows. Each row is a combination of all queried columns.
+	 */
+	public List<List<String>> handleSelectedData(List<List<String>> selectedData) {
+
+		List<List<String>> result = new ArrayList<List<String>>();
+		int index = 0;
+		int maxIndex = selectedData.get(0).size();
+		
+		while(index < maxIndex) {
+			List<String> eachRow = new ArrayList<String>();
+			for(List<String> column : selectedData) {
+				eachRow.add(column.get(index));
+			}
+			result.add(eachRow);
+		}
+		
+		return result;
+	}
+
+	/*SELECT data from data store files
+	 * 
+	 * Read from queried-column data store files. For each column, data is stored in List<Stirng>.
+	 * */
+	public List<List<String>> selectFromDateStore(String[] columns) {
+		
+		List<List<String>> selectFromDataStoreResult = new ArrayList<List<String>>();
+		
+		for(String column : columns) {
+			String dbStoreFileLocation =  "resource/db/" + IMPORTFILETYPE + "/" + column + ".txt";
+			List<String> columnResult = new ArrayList<String>();
+			columnResult = readDataFromDBStoreFile(dbStoreFileLocation);
+			selectFromDataStoreResult.add(columnResult);
+		}
+		return selectFromDataStoreResult;
 	}
 
 }

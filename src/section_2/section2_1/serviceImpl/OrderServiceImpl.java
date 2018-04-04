@@ -1,7 +1,6 @@
 package section_2.section2_1.serviceImpl;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -11,14 +10,17 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import section_2.section2_1.service.OrderService;
+import section_2.section2_1.service.SelectService;
 import section_2.util.DateConvertor;
 
 public class OrderServiceImpl implements OrderService {
 
-	/* Order the selected result by date.
+	/* Order the selected result by DATE.
 	 * 
-	 * Find the earliest date in DATA SELECT result, get the index(maybe more than one), then use the index to find all other columns in
-	 * other SELECT results. Store the found record. 
+	 * 1. Get DATE column in selected result. Convert String -> Date
+	 * 2. Handle selected result into rows of record. 
+	 * 3. Create HashMap<index, date>. sort the hashmap by value. The keyset of index is the row order
+	 * 4. Create a output, follow the index order to insert row into output.
 	 */
 	public List<List<String>> orderByDate(List<List<String>> selectedResult, int columnOfDATE_Index) {
 		
@@ -31,127 +33,144 @@ public class OrderServiceImpl implements OrderService {
 		for(String date : columnDateString) {
 			columnDate.add(dc.StringToDate(date));
 		}
+				
+		//handle selected data
+		SelectService selectService = new SelectServiceImpl();
+		List<List<String>> selectedRawOutputResult = selectService.handleSelectedData(selectedResult);
 		
-		/* Compare in list of Date record, find the earliest one, get it's index to find all associated record in other column
-		 * If more than one record found with same value and are the earliest, get all of the index to find all associated records in other columns
-		 * Add all record in a list as the ordered result
-	     */
-		Date minDate = Collections.min(columnDate);
+		//Create hashmap  
 		int index = 0;
+		HashMap<Integer, Date> indexOrderMap = new HashMap<Integer, Date>();
+
 		for(Date date: columnDate) {
-			List<String> eachResultRow = new ArrayList<String>();
-			if(date.equals(minDate)) {
-				for(List<String> column: selectedResult) {
-					eachResultRow.add(column.get(index));
-				}
-			}
-			queryOutput.add(eachResultRow);
-			index++;	
+			indexOrderMap.put(index++, date);
 		}
+		
+		//sort hashmap by value
+	    HashMap<Integer, Date> sortedMap = indexOrderMap.entrySet().stream().sorted(Entry.comparingByValue()).collect(Collectors.toMap(Entry::getKey, Entry::getValue,(e1, e2) -> e1, LinkedHashMap::new));
          
+	    //get the index order.
+	    Set<Integer> sortedIndex = sortedMap.keySet();
+	    
+	    for(Integer indexInSet : sortedIndex ) {
+			List<String> eachResultRow = new ArrayList<String>();
+			eachResultRow = selectedRawOutputResult.get(indexInSet);
+            queryOutput.add(eachResultRow);
+	    }
+
 		return queryOutput;
 	}
 
-	/* Order the SELECT result by Letter ascendent 
+	/* Order the selected result by letter ascendent 
 	 * 
-	 * 1. Store ordered column in HashMap<index, columnContent>
-	 * 2. Sort the HashMap by value: columnContent
-	 * 3. Get the KeySet in HashMap as the index set.
-	 * 4. Use the keyset to get all data from all columns
-	 * 5. Get the ordered result.
+     * 1. Handle selected result into rows of record. 
+	 * 2. Create HashMap<index, String>. sort the hashmap by value. The keyset of index is the row order
+	 * 3. Create a output, follow the index order to insert row into output.
 	 */
 	public List<List<String>> orderByLetter(List<List<String>> selectedResult, int columnOfString_Index) {
 
 		List<String> columnOfString  = selectedResult.get(columnOfString_Index);
 		List<List<String>> queryOutput = new ArrayList<List<String>>();
 
+		//handle selected data
+		SelectService selectService = new SelectServiceImpl();
+		List<List<String>> selectedRawOutputResult = selectService.handleSelectedData(selectedResult);
+		
 		int index = 0;
 		HashMap<Integer, String> indexAndColumn = new HashMap<Integer, String>();
 		
 		for(String eachRecordInColumn : columnOfString) {
 			indexAndColumn.put(index++, eachRecordInColumn);
 		}
-
-		//Java 8 can use below to sort HashMap<Integer, String> by value: String
+		
+		//Sort hashmap
 	    HashMap<Integer, String> sortedMap = indexAndColumn.entrySet().stream().sorted(Entry.comparingByValue()).collect(Collectors.toMap(Entry::getKey, Entry::getValue,(e1, e2) -> e1, LinkedHashMap::new));
-	
 	    Set<Integer> sortedIndex = sortedMap.keySet();
+	    
+	    
 	    
 	    for(Integer indexInSet : sortedIndex ) {
 			List<String> eachResultRow = new ArrayList<String>();
-              for(List<String> column: selectedResult) {
-            	  eachResultRow.add(column.get(indexInSet));
-              }
-              queryOutput.add(eachResultRow);
+			eachResultRow = selectedRawOutputResult.get(indexInSet);
+             queryOutput.add(eachResultRow);
 	    }
 	
 	    return queryOutput;
   }
 
-	/*Order the selected result by date and then letter
+	/*Order the selected result by date and then letter ascendent
 	 * 
-	 * 1.use method "orderByDate" to sort the SELECT result by date as initial output.
-	 * 2.Loop the initial output, Gather all same date rows that next row(s) date is same as currently row's date. (Because order priority is Date first then Letter)
-	 * 3.Use HashMap<Integer, String> to keep data. Key is index of row in initial output, value is the column value.
-	 * Sort Map by value: specificColumn in letter ascendent. Get the keySet with the index for orderd "same date rows"
-	 * 4.After sorting, use the index order in keyset to reorder initial output.
+	 * 1. Use method "orderByDate" to sort the selected result by date as initial output.
+	 * 2. Loop the initial output, get all rows that next row's date is same as currently row's date.
+	 * 3. For all rows we get from step2, use HashMap<index, columnToBeOrderd> to keep temp data. 
+	 *    Key is index of row in initial output, value is the column value.   
+	 * 4. Sort hashmap by it's value.  Get the keySet with the index. The index is for the rows in initial output.
+	 * 5. Create a new output. Insert all rows into it based on the index in keySet.
+	 * 6. Repeat step2-step5 until the loop ends.
+	 * 7. The new output is the results
+	 * 
 	 */
 	 
 	public List<List<String>> orderByDateThenLetter(List<List<String>> selectedResult, int columnOfDATE_Index, int columnOfString_Index) {
 		
-		List<List<String>> selectedResultbyDate =orderByDate(selectedResult, columnOfDATE_Index);
+		List<List<String>> outputResultOrderbyDate =orderByDate(selectedResult, columnOfDATE_Index);
 		List<List<String>> selectedResultbyDateAndLetter = new ArrayList<List<String>>();
 		
-		for(int i=0; i<selectedResultbyDate.size();i++)
+		//loop to gather all rows with same Date
+		for(int i=0; i<outputResultOrderbyDate.size();i++)
 		{
 			int j=i+1;
-			HashMap<Integer, String> temp = new HashMap<Integer, String>();
-			List<String> currentRow = selectedResultbyDate.get(i);
-			temp.put(i,currentRow.get(columnOfString_Index));
+			HashMap<Integer, String> tempMap = new HashMap<Integer, String>();
+			List<String> currentRow = outputResultOrderbyDate.get(i);
 			
-				//Check the situation index i reaches the end of the selectedResultbyDate
-				if(i==selectedResultbyDate.size()-1) {
+			//get current row's column value
+			String currentRowColumnValue = currentRow.get(columnOfString_Index);
+			tempMap.put(i,currentRowColumnValue);
+			
+			//Check the situation: index i reaches the end of the outputResultOrderbyDate
+			if(i==outputResultOrderbyDate.size()-1) {
 					break;
 				}
-				List<String> nextRow  = selectedResultbyDate.get(j);
+			List<String> nextRow  = outputResultOrderbyDate.get(j);
+			
+			//get next row's column value
+			String nextRowColumnValue = nextRow.get(columnOfString_Index);
+
 				
-				//If date is different, add current row in to lastest output
-				if(!currentRow.get(columnOfDATE_Index).equals(nextRow.get(columnOfDATE_Index))) {
+			//If date is different, add current row into the new output
+			if(!currentRowColumnValue.equals(nextRowColumnValue)) {
 					selectedResultbyDateAndLetter.add(currentRow);
 				}
-				
-				//Get index for all rows with same Date
-				else {
-				    while(currentRow.get(columnOfDATE_Index).equals(selectedResultbyDate.get(j).get(columnOfDATE_Index))) {
-					temp.put(j, nextRow.get(columnOfDATE_Index));
+			
+			// put all same-date column in hashamp. Sort hashmap and get the keyset index of intial output
+			else {
+			
+			//Get index for all rows with same Date
+			while(currentRow.equals(outputResultOrderbyDate.get(j).get(columnOfString_Index))) 
+			{
+			   tempMap.put(j, outputResultOrderbyDate.get(j).get(columnOfString_Index));
 					j++;
-				  }
-				}
-				//move pointer i to pointer j position.
-				i=j;
-		
-			//Java 8 can use below to sort HashMap<Integer, String> by value: String
-		    HashMap<Integer, String> sortedMap = temp.entrySet().stream().sorted(Entry.comparingByValue()).collect(Collectors.toMap(Entry::getKey, Entry::getValue,(e1, e2) -> e1, LinkedHashMap::new));
+		    }
+				
+			//Sort hashmap
+		    HashMap<Integer, String> sortedMap = tempMap.entrySet().stream().sorted(Entry.comparingByValue()).collect(Collectors.toMap(Entry::getKey, Entry::getValue,(e1, e2) -> e1, LinkedHashMap::new));
 			Set<Integer> sortedIndex = sortedMap.keySet();
 			
-			//add all sorted rows into latest output
-			 for(Integer indexInSet : sortedIndex ) {
-				 selectedResultbyDateAndLetter.add(selectedResultbyDate.get(indexInSet));
+			for(Integer indexInSet : sortedIndex ) {
+				 selectedResultbyDateAndLetter.add(outputResultOrderbyDate.get(indexInSet));
 			    }
-		}		
+			
+			//move pointer i to pointer j-1 position. Repeat the actions above until the loop ends. 
+			//j-1 is because when new iteration starts, i will plus 1. 
+			i=j-1;
+		  }			 
+	  }		
 		return selectedResultbyDateAndLetter;
 	}
 	
 
-	/*Order the selected result by letter ascendent and then date
-	 * TO BE IMPLEMENTED. Don't implement it since it's similar as as method "orderByDateThenLetter"
-	 * 
-	 * 1. High level, first get a initial output sort by letter. 
-	 * 2. Create a latest output.
-	 * 3. Loop the initial output. 
-	 *   (1)Gather all "same letter rows". Sort them and get their index in initial output. 
-	 *   (2)Insert into latest output based on the index
-	 * 4. When step 3 is loop over, the latest output is ready to be the query output.   
+	/* Order the selected result by letter ascendent and then date
+	 * This is similar to method "orderByDateThenLetter", so far just leave the method here
 	 */
 	public List<List<String>> orderByLetterThenDate(List<List<String>> selectedResult, int columnOfString_Index, int columnOfDATE_Index) {
 		return null;

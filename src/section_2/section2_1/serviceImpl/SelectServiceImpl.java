@@ -91,7 +91,7 @@ public class SelectServiceImpl implements SelectService{
 		List<List<String>> selectFromDataStoreResult = new ArrayList<List<String>>();
 		
 		for(String column : columns) {
-			String dbStoreFileLocation =  "resource/db/" + IMPORTFILETYPE + "/" + column + ".txt";
+			String dbStoreFileLocation =  "resource/dataStore/" + IMPORTFILETYPE + "/" + column + ".txt";
 			List<String> columnResult = new ArrayList<String>();
 			columnResult = readDataFromDBStoreFile(dbStoreFileLocation);
 			selectFromDataStoreResult.add(columnResult);

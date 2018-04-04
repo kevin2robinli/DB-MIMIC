@@ -55,7 +55,7 @@ public class ImporterServiceImpl implements section_1.importer.service.ImporterS
 
 	else
 	{
-	    String hashFileLocation = "resource/db/" + IMPORTFILETYPE + "/" + "RecordHash" + ".txt";	
+	    String hashFileLocation = "resource/dataStore/" + IMPORTFILETYPE + "/" + "RecordHash" + ".txt";	
 		String newRecordHash = generateRecordHash(columns);
 		List isRecordExsitResult = isRecordExist(hashFileLocation, newRecordHash);
 		
@@ -76,7 +76,7 @@ public class ImporterServiceImpl implements section_1.importer.service.ImporterS
         for(String column : columns) {
         	
         	//write data into DB storage files
-    	    String dbStorageFile = "resource/db/" + IMPORTFILETYPE + "/" + columnNames[nameIndex++] + ".txt";	
+    	    String dbStorageFile = "resource/dataStore/" + IMPORTFILETYPE + "/" + columnNames[nameIndex++] + ".txt";	
     	    dataStorageBufferWriter = new BufferedWriter(new FileWriter(dbStorageFile,true));
 		dataStorageBufferWriter.write(column);
 		dataStorageBufferWriter.newLine();
@@ -96,7 +96,7 @@ public class ImporterServiceImpl implements section_1.importer.service.ImporterS
 			int lineNumber = (int)isRecordExsitResult.get(1);	    
 	        for(String column : columns) {
 	        	//write data into DB storage files
-	    	    String dbStorageFile = "resource/db/" + IMPORTFILETYPE + "/" + columnNames[nameIndex++] + ".txt";	
+	    	    String dbStorageFile = "resource/dataStore/" + IMPORTFILETYPE + "/" + columnNames[nameIndex++] + ".txt";	
 	        	overwrite(dbStorageFile, lineNumber, column);		
 		}
 	}
@@ -125,7 +125,7 @@ public class ImporterServiceImpl implements section_1.importer.service.ImporterS
 	public void dbStorgeFolderCreation(String inputDataFileName) {
 		
 		  boolean directoryCreationStatus;  
-		  String path = "resource/db/" + inputDataFileName;
+		  String path = "resource/dataStore/" + inputDataFileName;
 		  File dir = new File(path);
 		  if(dir.exists()) {
 		      System.out.println("directory existed.");
@@ -147,7 +147,7 @@ public class ImporterServiceImpl implements section_1.importer.service.ImporterS
 		for(String column: columns) {
 	    boolean directoryCreationStatus;
 
-		File dbStoragefile = new File("resource/db/" + inputDataFileName + "/" + column + ".txt");
+		File dbStoragefile = new File("resource/dataStore/" + inputDataFileName + "/" + column + ".txt");
 		if ( dbStoragefile.exists()) {
 			System.out.println("File " + column + ".txt already exsits.");
 		
@@ -169,7 +169,7 @@ public class ImporterServiceImpl implements section_1.importer.service.ImporterS
 	}
 		
 	//create data storage hash file.	
-      File recordHash = new File("resource/db/" + inputDataFileName + "/" + "RecordHash" + ".txt");			
+      File recordHash = new File("resource/dataStore/" + inputDataFileName + "/" + "RecordHash" + ".txt");			
       if ( recordHash.exists()) {
 			System.out.println("File RecordHash.txt already exsits.");
 		}

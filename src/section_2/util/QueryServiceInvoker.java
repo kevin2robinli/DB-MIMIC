@@ -108,7 +108,7 @@ public class QueryServiceInvoker {
 		//Order by letter
 		else {
 			List<List<String>> orderByLetterResult = orderService.orderByLetter(selectedResult, orderColumnIndex);
-			outputService.queryOutput(orderByLetterResult, IMPORTFILETYPE, "orderByDate");		
+			outputService.queryOutput(orderByLetterResult, IMPORTFILETYPE, "orderBy"+orderColumns[0]);		
 		}
 	}
 
@@ -138,7 +138,7 @@ public class QueryServiceInvoker {
 			}
 			
 	 List<List<String>> orderByDateThenLetterResult = orderService.orderByDateThenLetter(selectedResult, orderColumn_DateIndex, orderColumn_OtherIndex);
-	 outputService.queryOutput(orderByDateThenLetterResult, IMPORTFILETYPE, "orderByDateThenLetter");				
+	 outputService.queryOutput(orderByDateThenLetterResult, IMPORTFILETYPE, "orderByDateThen"+orderColumns[1]);				
 		
 		}
 		

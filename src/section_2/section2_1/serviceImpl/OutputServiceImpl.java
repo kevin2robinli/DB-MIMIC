@@ -89,7 +89,7 @@ public class OutputServiceImpl implements OutputService{
 	public String queryOutputFileCreation(String queryOutputFolderLocation, String queryType) {
 		
 		    boolean directoryCreationStatus;
-		    String outputFilePath = queryOutputFolderLocation + "_" + queryType + "_" + Long.toString(new Date().getTime()) +".txt";
+		    String outputFilePath = queryOutputFolderLocation + "/" + queryType + "_" + Long.toString(new Date().getTime()) +".txt";
 
 			File outputFile = new File(outputFilePath);
 			try {

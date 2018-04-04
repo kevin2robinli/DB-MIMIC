@@ -125,20 +125,23 @@ public class OrderServiceImpl implements OrderService {
 			
 			//get current row's column value
 			String currentRowColumnValue = currentRow.get(columnOfString_Index);
+			String currentRowDate = currentRow.get(columnOfDATE_Index);
 			tempMap.put(i,currentRowColumnValue);
 			
 			//Check the situation: index i reaches the end of the outputResultOrderbyDate
 			if(i==outputResultOrderbyDate.size()-1) {
+				selectedResultbyDateAndLetter.add(currentRow);
 					break;
 				}
 			List<String> nextRow  = outputResultOrderbyDate.get(j);
 			
-			//get next row's column value
-			String nextRowColumnValue = nextRow.get(columnOfString_Index);
+			//get next row's date
+			String nextRowDate = nextRow.get(columnOfDATE_Index);
+
 
 				
 			//If date is different, add current row into the new output
-			if(!currentRowColumnValue.equals(nextRowColumnValue)) {
+			if(!currentRowDate.equals(nextRowDate)) {
 					selectedResultbyDateAndLetter.add(currentRow);
 				}
 			
@@ -146,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
 			else {
 			
 			//Get index for all rows with same Date
-			while(currentRow.equals(outputResultOrderbyDate.get(j).get(columnOfString_Index))) 
+			while(currentRowDate.equals(outputResultOrderbyDate.get(j).get(columnOfDATE_Index))) 
 			{
 			   tempMap.put(j, outputResultOrderbyDate.get(j).get(columnOfString_Index));
 					j++;

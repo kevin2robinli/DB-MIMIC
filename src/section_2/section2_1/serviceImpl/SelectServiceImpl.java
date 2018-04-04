@@ -76,6 +76,7 @@ public class SelectServiceImpl implements SelectService{
 				eachRow.add(column.get(index));
 			}
 			result.add(eachRow);
+			index++;
 		}
 		
 		return result;

@@ -8,9 +8,10 @@ public class QueryCommandParser {
 	 * Use HashMap to store command. the key is the query type, value is the associated columns or columns with filter
 	 * 
 	 * Currently, my query tool supports:  
-	 * (1)-s XXX 
-	 * (2)-s XXX -f XXX
-	 * (3)-s XXX -O XXX
+	 * (1)$s XXX,XXX,XXX,....... 
+	 * (2)$s XXX $f XXX
+	 * (3)$s XXX $o XXX,XXX
+	 * (4)$s XXX 
 	 * 
 	 * -s XXX -f XXX -o XXX will be added as future feature
 	 */

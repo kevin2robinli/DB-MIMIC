@@ -150,6 +150,7 @@ public class ImporterServiceImpl implements section_1.importer.service.ImporterS
 		File dbStoragefile = new File("resource/db/" + inputDataFileName + "/" + column + ".txt");
 		if ( dbStoragefile.exists()) {
 			System.out.println("File " + column + ".txt already exsits.");
+		
 		}
 		
 		else {
